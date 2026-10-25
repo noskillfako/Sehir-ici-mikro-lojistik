@@ -15,58 +15,78 @@ class AuthService {
 
   /// Uygulama ilk açıldığında test kolaylığı için varsayılan kullanıcıları yükler
   Future<void> seedDefaultUsersIfNeeded() async {
-    if (_db.usersBox.isEmpty) {
-      final defaultUsers = [
-        const UserModel(
-          id: 'usr_customer_1',
-          fullName: 'Ahmet Yılmaz',
-          phone: '5551112233',
-          password: '1234',
-          role: AppConstants.roleCustomer,
-        ),
-        const UserModel(
-          id: 'usr_courier_1',
-          fullName: 'Mehmet Demir',
-          phone: '5554445566',
-          password: '1234',
-          role: AppConstants.roleCourier,
-          vehicleType: AppConstants.vehicleMotorcycle,
-          plateNumber: '34 MTO 01',
-          hasThermalBag: true,
-        ),
-        const UserModel(
-          id: 'usr_courier_2',
-          fullName: 'Caner Kaya',
-          phone: '5557778899',
-          password: '1234',
-          role: AppConstants.roleCourier,
-          vehicleType: AppConstants.vehicleCar,
-          plateNumber: '34 AR 99',
-          hasThermalBag: false,
-        ),
-        const UserModel(
-          id: 'usr_courier_3',
-          fullName: 'Serkan Yıldız',
-          phone: '5552223344',
-          password: '1234',
-          role: AppConstants.roleCourier,
-          vehicleType: AppConstants.vehiclePanelvan,
-          plateNumber: '34 PNL 45',
-          hasThermalBag: false,
-        ),
-        const UserModel(
-          id: 'usr_courier_4',
-          fullName: 'Burak Koç',
-          phone: '5558889900',
-          password: '1234',
-          role: AppConstants.roleCourier,
-          vehicleType: AppConstants.vehicleTruck,
-          plateNumber: '34 TR 500',
-          hasThermalBag: false,
-        ),
-      ];
+    final defaultUsers = [
+      const UserModel(
+        id: 'usr_customer_1',
+        fullName: 'Ahmet Yılmaz',
+        phone: '5551112233',
+        password: '1234',
+        role: AppConstants.roleCustomer,
+      ),
+      const UserModel(
+        id: 'usr_courier_1',
+        fullName: 'Mehmet Demir',
+        phone: '5554445566',
+        password: '1234',
+        role: AppConstants.roleCourier,
+        vehicleType: AppConstants.vehicleMotorcycle,
+        plateNumber: '34 MTO 01',
+        hasThermalBag: true,
+      ),
+      const UserModel(
+        id: 'usr_courier_2',
+        fullName: 'Caner Kaya',
+        phone: '5557778899',
+        password: '1234',
+        role: AppConstants.roleCourier,
+        vehicleType: AppConstants.vehicleCar,
+        plateNumber: '34 AR 99',
+        hasThermalBag: false,
+      ),
+      const UserModel(
+        id: 'usr_courier_minivan',
+        fullName: 'Emre Şahin',
+        phone: '5553334455',
+        password: '1234',
+        role: AppConstants.roleCourier,
+        vehicleType: AppConstants.vehicleMinivan,
+        plateNumber: '34 MNV 12',
+        hasThermalBag: true,
+      ),
+      const UserModel(
+        id: 'usr_courier_3',
+        fullName: 'Serkan Yıldız',
+        phone: '5552223344',
+        password: '1234',
+        role: AppConstants.roleCourier,
+        vehicleType: AppConstants.vehiclePanelvan,
+        plateNumber: '34 PNL 45',
+        hasThermalBag: false,
+      ),
+      const UserModel(
+        id: 'usr_courier_maxivan',
+        fullName: 'Hakan Demir',
+        phone: '5556667788',
+        password: '1234',
+        role: AppConstants.roleCourier,
+        vehicleType: AppConstants.vehicleMaxivan,
+        plateNumber: '34 MXV 78',
+        hasThermalBag: false,
+      ),
+      const UserModel(
+        id: 'usr_courier_4',
+        fullName: 'Burak Koç',
+        phone: '5558889900',
+        password: '1234',
+        role: AppConstants.roleCourier,
+        vehicleType: AppConstants.vehicleTruck,
+        plateNumber: '34 TR 500',
+        hasThermalBag: false,
+      ),
+    ];
 
-      for (final user in defaultUsers) {
+    for (final user in defaultUsers) {
+      if (!_db.usersBox.containsKey(user.id)) {
         await _db.usersBox.put(user.id, user.toMap());
       }
     }

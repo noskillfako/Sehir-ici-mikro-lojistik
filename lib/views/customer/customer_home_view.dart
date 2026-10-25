@@ -7,6 +7,7 @@ import '../../services/order_tracking_service.dart';
 import '../../services/session_service.dart';
 import '../../widgets/order_card_widget.dart';
 import '../../widgets/route_duck_logo.dart';
+import '../../widgets/theme_avatar_illustration.dart';
 import '../auth/login_view.dart';
 import 'create_order_view.dart';
 import 'customer_order_detail_view.dart';
@@ -139,18 +140,9 @@ class _CustomerHomeViewState extends State<CustomerHomeView> {
                             ),
                             child: Row(
                               children: [
-                                Container(
-                                  width: 48,
-                                  height: 48,
-                                  decoration: BoxDecoration(
-                                    color: isDark ? const Color(0xFF1E2E22) : const Color(0xFFE2F3E7),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: const Icon(
-                                    Icons.person_rounded,
-                                    color: RouteDuckTheme.emeraldGreen,
-                                    size: 26,
-                                  ),
+                                ThemeAvatarIllustration.customer(
+                                  size: 48,
+                                  borderRadius: BorderRadius.circular(24),
                                 ),
                                 const SizedBox(width: 14),
                                 Expanded(

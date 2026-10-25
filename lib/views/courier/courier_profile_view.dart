@@ -6,8 +6,11 @@ import '../../services/auth_service.dart';
 import '../../services/order_tracking_service.dart';
 import '../../services/session_service.dart';
 import '../../widgets/order_card_widget.dart';
+import '../../widgets/theme_avatar_illustration.dart';
 import '../auth/login_view.dart';
+import '../customer/customer_home_view.dart';
 import 'courier_active_task_view.dart';
+import 'courier_pool_view.dart';
 
 /// Kurye Profil, Araç ve Görev Geçmişi Ekranı
 class CourierProfileView extends StatefulWidget {
@@ -65,6 +68,27 @@ class _CourierProfileViewState extends State<CourierProfileView> {
     }
   }
 
+  Future<void> _switchAccount(UserModel targetUser) async {
+    if (targetUser.id == _currentCourier?.id) return;
+    await _sessionService.saveSession(
+      userId: targetUser.id,
+      role: targetUser.role,
+      vehicleType: targetUser.vehicleType,
+    );
+    if (!mounted) return;
+    if (targetUser.role == AppConstants.roleCourier) {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => CourierPoolView(onToggleTheme: widget.onToggleTheme)),
+        (route) => false,
+      );
+    } else {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => CustomerHomeView(onToggleTheme: widget.onToggleTheme)),
+        (route) => false,
+      );
+    }
+  }
+
   String _getVehicleTitle(String? vType) {
     switch (vType) {
       case AppConstants.vehicleMotorcycle:
@@ -96,7 +120,6 @@ class _CourierProfileViewState extends State<CourierProfileView> {
       );
     }
 
-    final vehicleImage = AppConstants.vehicleImages[courier.vehicleType];
     final vehicleCapacity = AppConstants.vehicleMaxCapacityKg[courier.vehicleType] ?? 15.0;
     final allowedSizes = AppConstants.vehicleAllowedSizes[courier.vehicleType] ?? [];
 
@@ -152,33 +175,10 @@ class _CourierProfileViewState extends State<CourierProfileView> {
                             children: [
                               Row(
                                 children: [
-                                  Container(
-                                    width: 72,
-                                    height: 72,
-                                    padding: const EdgeInsets.all(6),
-                                    decoration: BoxDecoration(
-                                      color: isDark ? const Color(0xFF382315) : const Color(0xFFFDEEE3),
-                                      borderRadius: BorderRadius.circular(18),
-                                      border: Border.all(
-                                        color: isDark ? RouteDuckTheme.peachAmber : const Color(0xFFD97706),
-                                        width: 1.5,
-                                      ),
-                                    ),
-                                    child: vehicleImage != null
-                                        ? Image.asset(
-                                            vehicleImage,
-                                            fit: BoxFit.contain,
-                                            errorBuilder: (context, error, stackTrace) => const Icon(
-                                              Icons.delivery_dining_rounded,
-                                              size: 36,
-                                              color: RouteDuckTheme.peachAmber,
-                                            ),
-                                          )
-                                        : const Icon(
-                                            Icons.delivery_dining_rounded,
-                                            size: 36,
-                                            color: RouteDuckTheme.peachAmber,
-                                          ),
+                                  ThemeAvatarIllustration.fromUser(
+                                    courier,
+                                    size: 72,
+                                    borderRadius: BorderRadius.circular(18),
                                   ),
                                   const SizedBox(width: 16),
                                   Expanded(
@@ -442,6 +442,12 @@ class _CourierProfileViewState extends State<CourierProfileView> {
                           }),
                         const SizedBox(height: 24),
 
+                        const SizedBox(height: 20),
+
+                        // 5. Hızlı Hesap Değiştir (Test Profilleri)
+                        _buildAccountSwitcher(isDark),
+                        const SizedBox(height: 20),
+
                         // Çıkış Yap Butonu
                         OutlinedButton.icon(
                           onPressed: _logout,
@@ -500,6 +506,109 @@ class _CourierProfileViewState extends State<CourierProfileView> {
               color: isDark ? RouteDuckTheme.darkTextSecondary : RouteDuckTheme.lightTextSecondary,
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAccountSwitcher(bool isDark) {
+    final seedUsers = _authService.getSeedUsers();
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isDark ? RouteDuckTheme.darkCard : RouteDuckTheme.lightCard,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: isDark ? RouteDuckTheme.darkBorder : RouteDuckTheme.lightBorder,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.switch_account_rounded,
+                size: 18,
+                color: isDark ? RouteDuckTheme.peachAmber : const Color(0xFFD97706),
+              ),
+              const SizedBox(width: 8),
+              const Text(
+                'Hesap Değiştir (Test Profilleri)',
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          ...seedUsers.map((u) {
+            final isCurrent = u.id == _currentCourier?.id;
+            return Container(
+              margin: const EdgeInsets.only(bottom: 8),
+              child: InkWell(
+                onTap: isCurrent ? null : () => _switchAccount(u),
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: isCurrent
+                        ? (isDark ? const Color(0xFF382315) : const Color(0xFFFDEEE3))
+                        : (isDark ? const Color(0xFF160E09) : const Color(0xFFF8F4EE)),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: isCurrent
+                          ? (isDark ? RouteDuckTheme.peachAmber : const Color(0xFFD97706))
+                          : (isDark ? RouteDuckTheme.darkBorder : RouteDuckTheme.lightBorder),
+                      width: isCurrent ? 1.5 : 1,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      ThemeAvatarIllustration.fromUser(
+                        u,
+                        size: 38,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              u.fullName,
+                              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+                            ),
+                            Text(
+                              u.isCustomer
+                                  ? 'Müşteri Profili'
+                                  : 'Kurye (${u.vehicleType ?? "Araç"})',
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: isDark ? RouteDuckTheme.darkTextSecondary : RouteDuckTheme.lightTextSecondary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (isCurrent)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: isDark ? RouteDuckTheme.peachAmber : const Color(0xFFD97706),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: const Text(
+                            'Aktif',
+                            style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: Colors.white),
+                          ),
+                        )
+                      else
+                        const Icon(Icons.arrow_forward_ios_rounded, size: 12, color: Colors.grey),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }),
         ],
       ),
     );

@@ -7,7 +7,10 @@ import '../../services/auth_service.dart';
 import '../../services/order_tracking_service.dart';
 import '../../services/session_service.dart';
 import '../../widgets/order_card_widget.dart';
+import '../../widgets/theme_avatar_illustration.dart';
 import '../auth/login_view.dart';
+import '../courier/courier_pool_view.dart';
+import 'customer_home_view.dart';
 import 'customer_order_detail_view.dart';
 
 /// Müşteri Profil ve Geçmiş Siparişler Ekranı
@@ -74,6 +77,28 @@ class _CustomerProfileViewState extends State<CustomerProfileView> with SingleTi
     }
   }
 
+  Future<void> _switchAccount(UserModel targetUser) async {
+    final currentUserId = _currentUser?.id ?? _sessionService.getCurrentUserId();
+    if (targetUser.id == currentUserId) return;
+    await _sessionService.saveSession(
+      userId: targetUser.id,
+      role: targetUser.role,
+      vehicleType: targetUser.vehicleType,
+    );
+    if (!mounted) return;
+    if (targetUser.role == AppConstants.roleCourier) {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => CourierPoolView(onToggleTheme: widget.onToggleTheme)),
+        (route) => false,
+      );
+    } else {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => CustomerHomeView(onToggleTheme: widget.onToggleTheme)),
+        (route) => false,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -130,22 +155,9 @@ class _CustomerProfileViewState extends State<CustomerProfileView> with SingleTi
                             children: [
                               Row(
                                 children: [
-                                  Container(
-                                    width: 64,
-                                    height: 64,
-                                    decoration: BoxDecoration(
-                                      color: isDark ? const Color(0xFF1E2E22) : const Color(0xFFE2F3E7),
-                                      shape: BoxShape.circle,
-                                      border: Border.all(
-                                        color: RouteDuckTheme.emeraldGreen,
-                                        width: 2,
-                                      ),
-                                    ),
-                                    child: const Icon(
-                                      Icons.person_rounded,
-                                      color: RouteDuckTheme.emeraldGreen,
-                                      size: 34,
-                                    ),
+                                  ThemeAvatarIllustration.customer(
+                                    size: 64,
+                                    borderRadius: BorderRadius.circular(32),
                                   ),
                                   const SizedBox(width: 16),
                                   Expanded(
@@ -385,7 +397,11 @@ class _CustomerProfileViewState extends State<CustomerProfileView> with SingleTi
                             }
                           },
                         ),
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 20),
+
+                        // 5. Hızlı Hesap Değiştir (Test Profilleri)
+                        _buildAccountSwitcher(isDark, customerId),
+                        const SizedBox(height: 20),
 
                         // Çıkış Yap Butonu
                         OutlinedButton.icon(
@@ -445,6 +461,109 @@ class _CustomerProfileViewState extends State<CustomerProfileView> with SingleTi
               color: isDark ? RouteDuckTheme.darkTextSecondary : RouteDuckTheme.lightTextSecondary,
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAccountSwitcher(bool isDark, String currentId) {
+    final seedUsers = _authService.getSeedUsers();
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isDark ? RouteDuckTheme.darkCard : RouteDuckTheme.lightCard,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: isDark ? RouteDuckTheme.darkBorder : RouteDuckTheme.lightBorder,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.switch_account_rounded,
+                size: 18,
+                color: RouteDuckTheme.emeraldGreen,
+              ),
+              const SizedBox(width: 8),
+              const Text(
+                'Hesap Değiştir (Test Profilleri)',
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          ...seedUsers.map((u) {
+            final isCurrent = u.id == currentId;
+            return Container(
+              margin: const EdgeInsets.only(bottom: 8),
+              child: InkWell(
+                onTap: isCurrent ? null : () => _switchAccount(u),
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: isCurrent
+                        ? (isDark ? const Color(0xFF16251B) : const Color(0xFFE2F4E7))
+                        : (isDark ? const Color(0xFF160E09) : const Color(0xFFF8F4EE)),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: isCurrent
+                          ? RouteDuckTheme.emeraldGreen
+                          : (isDark ? RouteDuckTheme.darkBorder : RouteDuckTheme.lightBorder),
+                      width: isCurrent ? 1.5 : 1,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      ThemeAvatarIllustration.fromUser(
+                        u,
+                        size: 38,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              u.fullName,
+                              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+                            ),
+                            Text(
+                              u.isCustomer
+                                  ? 'Müşteri Profili'
+                                  : 'Kurye (${u.vehicleType ?? "Araç"})',
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: isDark ? RouteDuckTheme.darkTextSecondary : RouteDuckTheme.lightTextSecondary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (isCurrent)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: RouteDuckTheme.emeraldGreen,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: const Text(
+                            'Aktif',
+                            style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: Colors.white),
+                          ),
+                        )
+                      else
+                        const Icon(Icons.arrow_forward_ios_rounded, size: 12, color: Colors.grey),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }),
         ],
       ),
     );

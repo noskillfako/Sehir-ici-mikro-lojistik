@@ -7,6 +7,7 @@ import '../../services/auth_service.dart';
 import '../../services/hive_database_service.dart';
 import '../../services/session_service.dart';
 import '../../widgets/route_duck_logo.dart';
+import '../../widgets/theme_avatar_illustration.dart';
 import '../courier/courier_pool_view.dart';
 import '../customer/customer_home_view.dart';
 import 'register_view.dart';
@@ -116,50 +117,11 @@ class _LoginViewState extends State<LoginView> {
   }
 
   Widget _buildUserAvatar(UserModel user, bool isDark) {
-    if (user.isCustomer) {
-      return const Icon(
-        Icons.person_rounded,
-        color: RouteDuckTheme.emeraldGreen,
-        size: 22,
-      );
-    }
-
-    final imgPath = AppConstants.vehicleImages[user.vehicleType];
-    if (imgPath != null) {
-      return Image.asset(
-        imgPath,
-        fit: BoxFit.contain,
-        errorBuilder: (context, error, stackTrace) => Icon(
-          _getFallbackVehicleIcon(user.vehicleType),
-          color: isDark ? RouteDuckTheme.peachAmber : const Color(0xFFD97706),
-          size: 20,
-        ),
-      );
-    }
-
-    return Icon(
-      _getFallbackVehicleIcon(user.vehicleType),
-      color: isDark ? RouteDuckTheme.peachAmber : const Color(0xFFD97706),
-      size: 20,
+    return ThemeAvatarIllustration.fromUser(
+      user,
+      size: 44,
+      borderRadius: BorderRadius.circular(12),
     );
-  }
-
-  IconData _getFallbackVehicleIcon(String? vehicleType) {
-    switch (vehicleType) {
-      case AppConstants.vehicleMotorcycle:
-        return Icons.two_wheeler_rounded;
-      case AppConstants.vehicleCar:
-        return Icons.directions_car_rounded;
-      case AppConstants.vehicleMinivan:
-        return Icons.airport_shuttle_rounded;
-      case AppConstants.vehiclePanelvan:
-      case AppConstants.vehicleMaxivan:
-        return Icons.local_shipping_rounded;
-      case AppConstants.vehicleTruck:
-        return Icons.rv_hookup_rounded;
-      default:
-        return Icons.directions_car_rounded;
-    }
   }
 
   @override
@@ -335,20 +297,7 @@ class _LoginViewState extends State<LoginView> {
                       ),
                       child: Row(
                         children: [
-                          Container(
-                            width: 44,
-                            height: 44,
-                            padding: const EdgeInsets.all(4),
-                            decoration: BoxDecoration(
-                              color: isCust
-                                  ? (isDark ? const Color(0xFF1A3320) : const Color(0xFFE2F4E7))
-                                  : (isDark ? const Color(0xFF382315) : const Color(0xFFFDEEE3)),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Center(
-                              child: _buildUserAvatar(user, isDark),
-                            ),
-                          ),
+                          _buildUserAvatar(user, isDark),
                           const SizedBox(width: 12),
                           Expanded(
                             child: Column(

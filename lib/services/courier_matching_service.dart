@@ -19,10 +19,17 @@ class CourierMatchingService {
   }) {
     final vehicle = courier.vehicleType ?? AppConstants.vehicleMotorcycle;
 
-    // 1. Müşterinin Özel Araç Tercihi Varsa
+    // 1. Müşterinin Özel Araç Tercihi Varsa:
+    // Kuryenin aracı, müşterinin tercih ettiği araç sınıfının kapasitesini karşılayabilmelidir.
     if (order.preferredVehicle != null && order.preferredVehicle!.isNotEmpty) {
       if (vehicle != order.preferredVehicle) {
-        return false;
+        final courierWeight = AppConstants.vehicleMaxCapacityKg[vehicle] ?? 0.0;
+        final courierVolume = AppConstants.vehicleMaxCapacityLiters[vehicle] ?? 0.0;
+        final preferredWeight = AppConstants.vehicleMaxCapacityKg[order.preferredVehicle] ?? 0.0;
+        final preferredVolume = AppConstants.vehicleMaxCapacityLiters[order.preferredVehicle] ?? 0.0;
+        if (courierWeight < preferredWeight || courierVolume < preferredVolume) {
+          return false;
+        }
       }
     }
 

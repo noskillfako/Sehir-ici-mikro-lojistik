@@ -277,7 +277,9 @@ class _CreateOrderViewState extends State<CreateOrderView> {
         totalWeightKg: _totalWeightKg,
         totalVolumeLiters: _totalVolumeLiters,
         recommendedVehicle: _recommendedVehicleKey,
-        preferredVehicle: selectedVehicle,
+        preferredVehicle: (_preferredVehicle != null && _preferredVehicle != _recommendedVehicleKey)
+            ? _preferredVehicle
+            : null,
         contentType: 'Genel Kargo',
         customDescription: desc,
         isFragile: _isFragile,

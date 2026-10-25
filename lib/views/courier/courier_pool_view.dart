@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../core/constants/app_constants.dart';
 import '../../core/errors/error_handler.dart';
 import '../../core/theme/app_theme.dart';
 import '../../models/order_model.dart';
@@ -10,6 +9,7 @@ import '../../services/order_tracking_service.dart';
 import '../../services/session_service.dart';
 import '../../widgets/order_card_widget.dart';
 import '../../widgets/route_duck_logo.dart';
+import '../../widgets/theme_avatar_illustration.dart';
 import '../auth/login_view.dart';
 import 'courier_active_task_view.dart';
 import 'courier_profile_view.dart';
@@ -83,11 +83,11 @@ class _CourierPoolViewState extends State<CourierPoolView> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    if (_currentCourier == null) {
+    final courier = _authService.getCurrentUser() ?? _currentCourier;
+
+    if (courier == null) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
-
-    final courier = _currentCourier!;
 
     return Scaffold(
       appBar: AppBar(
@@ -110,14 +110,23 @@ class _CourierPoolViewState extends State<CourierPoolView> {
         ),
         actions: [
           IconButton(
+            icon: const Icon(Icons.refresh_rounded),
+            tooltip: 'Havuzu Yenile',
+            onPressed: () {
+              _loadCourier();
+              ErrorHandler.showSuccess(context, 'Kurye havuzu güncellendi.');
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.person_outline_rounded),
             tooltip: 'Kurye Profilim',
-            onPressed: () {
-              Navigator.of(context).push(
+            onPressed: () async {
+              await Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (_) => CourierProfileView(onToggleTheme: widget.onToggleTheme),
                 ),
               );
+              _loadCourier();
             },
           ),
           if (widget.onToggleTheme != null)
@@ -148,8 +157,12 @@ class _CourierPoolViewState extends State<CourierPoolView> {
               (sum, item) => sum + item.courierEarnings,
             );
 
-            return SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
+            return RefreshIndicator(
+              onRefresh: () async {
+                _loadCourier();
+              },
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
               child: Center(
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 680),
@@ -179,29 +192,10 @@ class _CourierPoolViewState extends State<CourierPoolView> {
                             ),
                   child: Row(
                     children: [
-                      Container(
-                        width: 52,
-                        height: 52,
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          color: isDark ? const Color(0xFF382315) : const Color(0xFFFDEEE3),
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        child: AppConstants.vehicleImages[courier.vehicleType] != null
-                            ? Image.asset(
-                                AppConstants.vehicleImages[courier.vehicleType]!,
-                                fit: BoxFit.contain,
-                                errorBuilder: (context, error, stackTrace) => Icon(
-                                  Icons.delivery_dining_rounded,
-                                  color: isDark ? RouteDuckTheme.peachAmber : const Color(0xFFD97706),
-                                  size: 26,
-                                ),
-                              )
-                            : Icon(
-                                Icons.delivery_dining_rounded,
-                                color: isDark ? RouteDuckTheme.peachAmber : const Color(0xFFD97706),
-                                size: 26,
-                              ),
+                      ThemeAvatarIllustration.fromUser(
+                        courier,
+                        size: 52,
+                        borderRadius: BorderRadius.circular(14),
                       ),
                       const SizedBox(width: 14),
                       Expanded(
@@ -445,8 +439,9 @@ class _CourierPoolViewState extends State<CourierPoolView> {
                   ),
                 ),
               ),
-            );
-          },
+            ),
+          );
+        },
         ),
       ),
     );
