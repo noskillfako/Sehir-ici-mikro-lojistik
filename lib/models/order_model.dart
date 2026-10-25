@@ -11,6 +11,11 @@ class OrderModel {
   final String? courierVehicle;
   final String? preferredVehicle; // Müşterinin tercih ettiği teslimat aracı (Opsiyonel)
   final String packageSize; // 'DOCUMENT', 'SMALL', 'MEDIUM', 'LARGE', 'XLARGE', 'PALLET', 'HEAVY_CARGO'
+  final int itemCount; // Taşınacak toplam ürün/koli adedi (varsayılan: 1)
+  final Map<String, int> itemQuantities; // Her ürün boyutundan seçilen adetler
+  final double totalWeightKg; // Toplam ağırlık: Birim Ağırlık x Adet
+  final double totalVolumeLiters; // Toplam hacim: Birim Hacim x Adet
+  final String recommendedVehicle; // Algoritmanın önerdiği ideal araç anahtarı
   final String contentType;
   final String customDescription;
   final bool isFragile;
@@ -39,6 +44,11 @@ class OrderModel {
     this.courierVehicle,
     this.preferredVehicle,
     required this.packageSize,
+    this.itemCount = 1,
+    this.itemQuantities = const {},
+    this.totalWeightKg = 0.5,
+    this.totalVolumeLiters = 2.0,
+    this.recommendedVehicle = AppConstants.vehicleMotorcycle,
     required this.contentType,
     required this.customDescription,
     required this.isFragile,
@@ -127,6 +137,38 @@ class OrderModel {
     }
   }
 
+  String get recommendedVehicleDisplayTr {
+    switch (recommendedVehicle) {
+      case AppConstants.vehicleMotorcycle:
+        return 'Motosiklet (Maxi Scooter)';
+      case AppConstants.vehicleCar:
+        return 'Binek Otomobil (Sedan)';
+      case AppConstants.vehicleMinivan:
+        return 'Kompakt Minivan';
+      case AppConstants.vehiclePanelvan:
+        return 'Standart Panelvan';
+      case AppConstants.vehicleMaxivan:
+        return 'Maxi Panelvan';
+      case AppConstants.vehicleTruck:
+        return 'Ağır Ticari Kamyon / Tır';
+      default:
+        return recommendedVehicle;
+    }
+  }
+
+  String get itemQuantitiesSummaryTr {
+    if (itemQuantities.isEmpty) {
+      return '$itemCount Adet $packageSizeDisplayTr';
+    }
+    final parts = <String>[];
+    itemQuantities.forEach((size, qty) {
+      if (qty > 0) {
+        parts.add('$qty Adet ${AppConstants.packageSizeTitle(size)}');
+      }
+    });
+    return parts.isEmpty ? '$itemCount Adet $packageSizeDisplayTr' : parts.join(', ');
+  }
+
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -137,6 +179,11 @@ class OrderModel {
       'courierVehicle': courierVehicle,
       'preferredVehicle': preferredVehicle,
       'packageSize': packageSize,
+      'itemCount': itemCount,
+      'itemQuantities': itemQuantities,
+      'totalWeightKg': totalWeightKg,
+      'totalVolumeLiters': totalVolumeLiters,
+      'recommendedVehicle': recommendedVehicle,
       'contentType': contentType,
       'customDescription': customDescription,
       'isFragile': isFragile,
@@ -168,6 +215,13 @@ class OrderModel {
       courierVehicle: map['courierVehicle'] as String?,
       preferredVehicle: map['preferredVehicle'] as String?,
       packageSize: map['packageSize'] as String,
+      itemCount: (map['itemCount'] as num?)?.toInt() ?? 1,
+      itemQuantities: map['itemQuantities'] != null
+          ? (map['itemQuantities'] as Map).map((k, v) => MapEntry(k.toString(), (v as num).toInt()))
+          : {map['packageSize'] as String? ?? AppConstants.sizeDocument: (map['itemCount'] as num?)?.toInt() ?? 1},
+      totalWeightKg: (map['totalWeightKg'] as num?)?.toDouble() ?? 0.5,
+      totalVolumeLiters: (map['totalVolumeLiters'] as num?)?.toDouble() ?? 2.0,
+      recommendedVehicle: map['recommendedVehicle'] as String? ?? AppConstants.vehicleMotorcycle,
       contentType: map['contentType'] as String,
       customDescription: map['customDescription'] as String,
       isFragile: map['isFragile'] as bool? ?? false,
@@ -198,6 +252,11 @@ class OrderModel {
     String? courierVehicle,
     String? preferredVehicle,
     String? packageSize,
+    int? itemCount,
+    Map<String, int>? itemQuantities,
+    double? totalWeightKg,
+    double? totalVolumeLiters,
+    String? recommendedVehicle,
     String? contentType,
     String? customDescription,
     bool? isFragile,
@@ -226,6 +285,11 @@ class OrderModel {
       courierVehicle: courierVehicle ?? this.courierVehicle,
       preferredVehicle: preferredVehicle ?? this.preferredVehicle,
       packageSize: packageSize ?? this.packageSize,
+      itemCount: itemCount ?? this.itemCount,
+      itemQuantities: itemQuantities ?? this.itemQuantities,
+      totalWeightKg: totalWeightKg ?? this.totalWeightKg,
+      totalVolumeLiters: totalVolumeLiters ?? this.totalVolumeLiters,
+      recommendedVehicle: recommendedVehicle ?? this.recommendedVehicle,
       contentType: contentType ?? this.contentType,
       customDescription: customDescription ?? this.customDescription,
       isFragile: isFragile ?? this.isFragile,

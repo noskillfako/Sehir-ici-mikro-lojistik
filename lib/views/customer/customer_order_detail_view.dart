@@ -214,11 +214,11 @@ class _CustomerOrderDetailViewState extends State<CustomerOrderDetailView> {
                       _buildStepItem(
                         title: '2. Kurye Yola Çıktı',
                         subtitle: order.courierName != null
-                            ? '${order.courierName} (${order.courierVehicle ?? "Kurye"}) paketi teslim almaya geliyor'
+                            ? '${order.courierName} (${order.courierVehicle != null ? AppConstants.getVehicleTitle(order.courierVehicle) : "Kurye"}) paketi teslim almaya geliyor'
                             : 'Kurye ataması bekleniyor',
                         isDone: isInTransit || isDelivered,
                         isActive: isAssigned,
-                        icon: Icons.two_wheeler_rounded,
+                        icon: AppConstants.getVehicleIcon(order.courierVehicle ?? order.preferredVehicle ?? order.recommendedVehicle),
                       ),
                       _buildStepItem(
                         title: '3. Paket Dağıtımda',
@@ -377,8 +377,27 @@ class _CustomerOrderDetailViewState extends State<CustomerOrderDetailView> {
                       Text(order.dropoffAddressDetail, style: TextStyle(fontSize: 12, color: isDark ? RouteDuckTheme.darkTextSecondary : RouteDuckTheme.lightTextSecondary)),
                       const Divider(height: 20),
                       const Text('Paket Detayları', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
-                      const SizedBox(height: 6),
                       Text('Kategori: ${order.contentType} • ${order.packageSizeDisplayTr}', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+                      const SizedBox(height: 4),
+                      Text('Ürün Dağılımı: ${order.itemQuantitiesSummaryTr}', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Toplam Yük: ${order.itemCount} Adet • ${order.totalWeightKg.toStringAsFixed(1)} kg • ${order.totalVolumeLiters.toStringAsFixed(0)} Litre (~${(order.totalVolumeLiters / 1000).toStringAsFixed(2)} m³)',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: isDark ? RouteDuckTheme.emeraldGreen : RouteDuckTheme.deepForest,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Tavsiye Edilen Araç: ${order.recommendedVehicleDisplayTr}',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: isDark ? RouteDuckTheme.peachAmber : const Color(0xFFD97706),
+                        ),
+                      ),
                       if (order.preferredVehicle != null) ...[
                         const SizedBox(height: 4),
                         Text('Tercih Edilen Araç: ${order.preferredVehicleDisplayTr}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: isDark ? RouteDuckTheme.peachAmber : const Color(0xFFD97706))),

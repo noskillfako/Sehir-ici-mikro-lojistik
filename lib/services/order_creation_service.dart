@@ -29,11 +29,16 @@ class OrderCreationService {
     required String customerId,
     required String customerName,
     required String packageSize,
+    int itemCount = 1,
+    Map<String, int>? itemQuantities,
+    double? totalWeightKg,
+    double? totalVolumeLiters,
+    String? recommendedVehicle,
+    String? preferredVehicle,
     required String contentType,
     required String customDescription,
     required bool isFragile,
     required bool requiresThermalBag,
-    String? preferredVehicle,
     required String pickupTitle,
     required String pickupAddressDetail,
     required double pickupLat,
@@ -59,17 +64,27 @@ class OrderCreationService {
       throw AppException.sameLocation();
     }
 
-    // Mesafe ve fiyat hesaplama
+    // Mesafe ve yük hesaplama
     final pickupPoint = LatLng(pickupLat, pickupLng);
     final dropoffPoint = LatLng(dropoffLat, dropoffLng);
     final distanceKm = _mapService.calculateRouteDistanceKm(pickupPoint, dropoffPoint);
 
+    final weight = totalWeightKg ??
+        ((AppConstants.packageUnitWeightsKg[packageSize] ?? 0.5) * itemCount);
+    final volume = totalVolumeLiters ??
+        ((AppConstants.packageUnitVolumesLiters[packageSize] ?? 2.0) * itemCount);
+    final recVehicle = recommendedVehicle ??
+        AppConstants.getRecommendedVehicle(weight, volume);
+
     final price = _pricingService.calculateTotalPrice(
       distanceKm: distanceKm,
       packageSize: packageSize,
+      itemCount: itemCount,
+      totalWeightKg: weight,
+      totalVolumeLiters: volume,
       isFragile: isFragile,
       requiresThermalBag: requiresThermalBag,
-      vehicleType: preferredVehicle,
+      vehicleType: preferredVehicle ?? recVehicle,
     );
 
     // Sipariş ID'si ve OTP
@@ -84,7 +99,12 @@ class OrderCreationService {
       customerName: customerName,
       courierVehicle: null,
       preferredVehicle: preferredVehicle,
+      recommendedVehicle: recVehicle,
       packageSize: packageSize,
+      itemCount: itemCount,
+      itemQuantities: itemQuantities ?? {packageSize: itemCount},
+      totalWeightKg: weight,
+      totalVolumeLiters: volume,
       contentType: contentType,
       customDescription: customDescription.trim(),
       isFragile: isFragile,

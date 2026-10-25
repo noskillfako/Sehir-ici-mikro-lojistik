@@ -72,9 +72,12 @@ class _CourierActiveTaskViewState extends State<CourierActiveTaskView> {
         final isInTransit = order.status == AppConstants.statusInTransit;
         final isDelivered = order.status == AppConstants.statusDelivered;
 
+        final vehicleKey = order.courierVehicle ?? order.preferredVehicle ?? order.recommendedVehicle;
+        final vehicleIcon = AppConstants.getVehicleIcon(vehicleKey);
+
         final estimatedMin = _mapService.calculateEstimatedMinutes(
           order.distanceKm,
-          order.courierVehicle ?? AppConstants.vehicleMotorcycle,
+          vehicleKey,
         );
 
         return Scaffold(
@@ -113,7 +116,7 @@ class _CourierActiveTaskViewState extends State<CourierActiveTaskView> {
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
-                          isAssigned ? Icons.directions_bike_rounded : Icons.local_shipping_rounded,
+                          vehicleIcon,
                           color: RouteDuckTheme.emeraldGreen,
                           size: 26,
                         ),

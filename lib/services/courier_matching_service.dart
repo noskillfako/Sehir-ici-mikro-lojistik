@@ -26,10 +26,18 @@ class CourierMatchingService {
       }
     }
 
-    // 2. Kapasite ve Boyut Kontrolü (6 Araç & 7 Boyut Sınıfı)
-    final allowedSizes = AppConstants.vehicleAllowedSizes[vehicle] ?? [AppConstants.sizeDocument];
-    if (!allowedSizes.contains(order.packageSize)) {
-      return false;
+    // 2. Gerçek Dünya Kapasite ve Boyut Kontrolü (Ağırlık ve Hacim)
+    final maxWeight = AppConstants.vehicleMaxCapacityKg[vehicle] ?? 20.0;
+    final maxVolume = AppConstants.vehicleMaxCapacityLiters[vehicle] ?? 60.0;
+    if (order.totalWeightKg > 0 && order.totalVolumeLiters > 0) {
+      if (order.totalWeightKg > maxWeight || order.totalVolumeLiters > maxVolume) {
+        return false;
+      }
+    } else {
+      final allowedSizes = AppConstants.vehicleAllowedSizes[vehicle] ?? [AppConstants.sizeDocument];
+      if (!allowedSizes.contains(order.packageSize)) {
+        return false;
+      }
     }
 
     // 3. Termal Çanta Kontrolü

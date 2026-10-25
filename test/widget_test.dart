@@ -1,5 +1,7 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sehir_ici_mikro_lojistik/core/constants/app_constants.dart';
+import 'package:sehir_ici_mikro_lojistik/models/order_model.dart';
 import 'package:sehir_ici_mikro_lojistik/models/user_model.dart';
 import 'package:sehir_ici_mikro_lojistik/services/pricing_service.dart';
 
@@ -133,6 +135,118 @@ void main() {
       // Kargo araç listesinde 6 araç tipi bulunmalıdır
       expect(AppConstants.courierVehicles.length, 6);
       expect(AppConstants.vehicleMaxCapacityKg[AppConstants.vehicleTruck], 25000);
+    });
+
+    test('OrderModel yeni alanlar (itemCount, totalWeightKg, totalVolumeLiters, recommendedVehicle) toMap ve fromMap doğru çalışmalıdır', () {
+      final model = OrderModel(
+        id: 'ORD-9999',
+        customerId: 'cust-1',
+        customerName: 'Ahmet Yılmaz',
+        packageSize: AppConstants.sizeMedium,
+        itemCount: 3,
+        totalWeightKg: 30.0,
+        totalVolumeLiters: 150.0,
+        recommendedVehicle: AppConstants.vehicleCar,
+        preferredVehicle: AppConstants.vehicleCar,
+        contentType: 'Koli',
+        customDescription: '3 adet orta koli malzeme',
+        isFragile: true,
+        requiresThermalBag: false,
+        pickupTitle: 'Kadıköy',
+        pickupAddressDetail: 'Moda Cad. No:5',
+        pickupLat: 40.98,
+        pickupLng: 29.02,
+        dropoffTitle: 'Beşiktaş',
+        dropoffAddressDetail: 'Çarşı No:10',
+        dropoffLat: 41.04,
+        dropoffLng: 29.00,
+        distanceKm: 12.0,
+        price: 350.0,
+        deliveryOtpCode: '5821',
+        status: AppConstants.statusWaiting,
+        createdAt: DateTime.now().toIso8601String(),
+      );
+
+      final map = model.toMap();
+      expect(map['itemCount'], 3);
+      expect(map['totalWeightKg'], 30.0);
+      expect(map['totalVolumeLiters'], 150.0);
+      expect(map['recommendedVehicle'], AppConstants.vehicleCar);
+
+      final fromMap = OrderModel.fromMap(map);
+      expect(fromMap.itemCount, 3);
+      expect(fromMap.totalWeightKg, 30.0);
+      expect(fromMap.totalVolumeLiters, 150.0);
+      expect(fromMap.recommendedVehicle, AppConstants.vehicleCar);
+      expect(fromMap.recommendedVehicleDisplayTr, 'Binek Otomobil (Sedan)');
+    });
+
+    test('Akıllı Araç Tavsiye Motoru: Ağırlık ve Hacim Kapasitelerine Göre En Uygun Aracı Seçmelidir', () {
+      // 1 Adet Zarf (0.5 kg, 2 L) -> Motosiklet (max 20 kg, 60 L)
+      expect(AppConstants.getRecommendedVehicle(0.5, 2.0), AppConstants.vehicleMotorcycle);
+
+      // 1 Adet Orta Koli (10 kg, 50 L) -> Motosiklet (max 20 kg, 60 L)
+      expect(AppConstants.getRecommendedVehicle(10.0, 50.0), AppConstants.vehicleMotorcycle);
+
+      // 2 Adet Orta Koli (20 kg, 100 L) -> Hacim 100 L > Motosiklet 60 L -> Binek Otomobil (max 200 kg, 500 L)
+      expect(AppConstants.getRecommendedVehicle(20.0, 100.0), AppConstants.vehicleCar);
+
+      // 10 Adet Büyük Koli (300 kg, 1500 L) -> Binek Otomobil yetmez -> Minivan (max 600 kg, 3000 L)
+      expect(AppConstants.getRecommendedVehicle(300.0, 1500.0), AppConstants.vehicleMinivan);
+
+      // 1 Adet Sanayi Yükü (500 kg, 2000 L) -> Minivan (max 600 kg, 3000 L)
+      expect(AppConstants.getRecommendedVehicle(500.0, 2000.0), AppConstants.vehicleMinivan);
+
+      // 2 Adet Sanayi Yükü (1000 kg, 4000 L) -> Panelvan (max 1200 kg, 8000 L)
+      expect(AppConstants.getRecommendedVehicle(1000.0, 4000.0), AppConstants.vehiclePanelvan);
+
+      // 3 Adet Sanayi Yükü (1500 kg, 6000 L) -> Maxi Van (max 1800 kg, 14000 L)
+      expect(AppConstants.getRecommendedVehicle(1500.0, 6000.0), AppConstants.vehicleMaxivan);
+
+      // 6 Adet Sanayi Yükü (3000 kg, 12000 L) -> Ağır Ticari Kamyon/Tır
+      expect(AppConstants.getRecommendedVehicle(3000.0, 12000.0), AppConstants.vehicleTruck);
+    });
+
+    test('Dinamik adet ve toplam ağırlık/hacim baremi fiyatı doğru güncellemelidir', () {
+      final pricing = PricingService();
+
+      // 1 Adet Zarf (0.5 kg, 2 L), 10 km -> Barem: 1.0 -> 210 TL
+      final singleDoc = pricing.calculateTotalPrice(
+        distanceKm: 10.0,
+        packageSize: AppConstants.sizeDocument,
+        itemCount: 1,
+        totalWeightKg: 0.5,
+        totalVolumeLiters: 2.0,
+        isFragile: false,
+        requiresThermalBag: false,
+      );
+      expect(singleDoc, 210.0);
+
+      // 10 Adet Zarf (5 kg, 20 L), 10 km -> Barem: Küçük Paket baremi (1.2) -> (60 + 150) * 1.2 = 252 TL
+      final multiDoc = pricing.calculateTotalPrice(
+        distanceKm: 10.0,
+        packageSize: AppConstants.sizeDocument,
+        itemCount: 10,
+        totalWeightKg: 5.0,
+        totalVolumeLiters: 20.0,
+        isFragile: false,
+        requiresThermalBag: false,
+      );
+      expect(multiDoc, 252.0);
+    });
+
+    test('Araç sembolleri (getVehicleIcon) ve başlıkları (getVehicleTitle) doğru eşleşmeli, bisiklet sembolü kullanılmamalıdır', () {
+      // Motosiklet: Bisiklet (directions_bike) DEĞİL, motor/scooter (two_wheeler_rounded) olmalıdır
+      expect(AppConstants.getVehicleIcon(AppConstants.vehicleMotorcycle), Icons.two_wheeler_rounded);
+      expect(AppConstants.getVehicleIcon(AppConstants.vehicleCar), Icons.directions_car_rounded);
+      expect(AppConstants.getVehicleIcon(AppConstants.vehicleMinivan), Icons.airport_shuttle_rounded);
+      expect(AppConstants.getVehicleIcon(AppConstants.vehiclePanelvan), Icons.local_shipping_rounded);
+      expect(AppConstants.getVehicleIcon(AppConstants.vehicleMaxivan), Icons.rv_hookup_rounded);
+      expect(AppConstants.getVehicleIcon(AppConstants.vehicleTruck), Icons.fire_truck_rounded);
+
+      // Başlıklar
+      expect(AppConstants.getVehicleTitle(AppConstants.vehicleMotorcycle), 'Motosiklet / Scooter');
+      expect(AppConstants.getVehicleTitle(AppConstants.vehicleCar), 'Binek Otomobil (Sedan)');
     });
   });
 }

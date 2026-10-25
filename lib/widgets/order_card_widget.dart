@@ -189,6 +189,35 @@ class OrderCardWidget extends StatelessWidget {
                     ),
                   ),
                 ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: (isDark ? RouteDuckTheme.emeraldGreen : RouteDuckTheme.deepForest).withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(
+                      color: (isDark ? RouteDuckTheme.emeraldGreen : RouteDuckTheme.deepForest).withValues(alpha: 0.3),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.inventory_2_outlined,
+                        size: 11,
+                        color: isDark ? RouteDuckTheme.emeraldGreen : RouteDuckTheme.deepForest,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${order.itemCount} Adet • ${order.totalWeightKg.toStringAsFixed(order.totalWeightKg.truncateToDouble() == order.totalWeightKg ? 0 : 1)} kg • ${order.totalVolumeLiters.toStringAsFixed(0)} L',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w800,
+                          color: isDark ? RouteDuckTheme.emeraldGreen : RouteDuckTheme.deepForest,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
                 if (order.isFragile)
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
