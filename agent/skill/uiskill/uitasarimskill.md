@@ -32,26 +32,35 @@ Bu modül; **routeDuck** (Şehir İçi Mikro-Lojistik) uygulamasının tüm aray
 
 ## 3. Kurye Araç Seçim Ekranı ve Kapasite Kataloğu
 
-Kurye kayıt ve araç güncelleme ekranlarında (`register_view.dart` & kurye profil ekranı), sisteme tanımlı 5 ana araç kategorisi 3D izometrik kartlar halinde sunulur.
+Kurye kayıt ve araç güncelleme ekranlarında (`register_view.dart` & kurye profil ekranı), sisteme tanımlı 6 ana araç kategorisi 3D izometrik şeffaf görsellerle ve kartlar halinde sunulur.
 
-### Araç Kataloğu ve Kapasite Kuralları:
+### 6 Araç Kataloğu, Dosya Yolları ve Kapasite Kuralları:
 1. **`MOTORCYCLE` (Kurye Maxi Scooter / Motosiklet):**
-   - *Görsel:* Siperlikli, arka çantalı beyaz maxi scooter.
-   - *Taşıma Kapasitesi:* `DOCUMENT`, `SMALL`, `MEDIUM` (Koli ve zarf gönderileri).
+   - *Görsel:* `assets/images/vehicles/motorcycle.png` (Siperlikli, arka çantalı beyaz maxi scooter)
+   - *Taşıma Kapasitesi:* `DOCUMENT`, `SMALL`, `MEDIUM` (Maksimum 15 Kg).
    - *Avantaj:* Yoğun saatlerde en hızlı teslimat, dinamik dar sokak rotaları.
 2. **`CAR` (Binek Otomobil / Sedan):**
-   - *Görsel:* Beyaz sedan binek otomobil (Toyota Corolla tarzı).
-   - *Taşıma Kapasitesi:* `DOCUMENT`, `SMALL`, `MEDIUM`, `LARGE` (Tüm paketler).
+   - *Görsel:* `assets/images/vehicles/car.png` (Beyaz sedan binek otomobil)
+   - *Taşıma Kapasitesi:* `DOCUMENT`, `SMALL`, `MEDIUM`, `LARGE` (Maksimum 60 Kg).
    - *Özellik:* Hassas eşya, takım elbise/çiçek ve çoklu paket taşıma.
 3. **`MINIVAN` (Küçük Ticari / City Van):**
-   - *Görsel:* Beyaz kompakt panelvan (Citroen Berlingo / Partner tarzı).
-   - *Taşıma Kapasitesi:* Tüm kargo boyutları + orta hacimli çoklu sipariş kümeleme.
+   - *Görsel:* `assets/images/vehicles/minivan.png` (Beyaz kompakt panelvan - Berlingo/Partner tarzı)
+   - *Taşıma Kapasitesi:* `DOCUMENT`, `SMALL`, `MEDIUM`, `LARGE`, `XLARGE` (Maksimum 200 Kg).
 4. **`PANELVAN` (Standart Hafif Ticari):**
-   - *Görsel:* Kısa şasi kapalı kasa panelvan.
-   - *Taşıma Kapasitesi:* 15+ kg büyük koliler, toptan dükkan sevkiyatları.
+   - *Görsel:* `assets/images/vehicles/panelvan.png` (Kısa şasi kapalı kasa panelvan)
+   - *Taşıma Kapasitesi:* `DOCUMENT`, `SMALL`, `MEDIUM`, `LARGE`, `XLARGE` (Maksimum 450 Kg).
 5. **`MAXIVAN` (Büyük Boy Yüksek Tavan Ticari):**
-   - *Görsel:* Uzun şasi yüksek tavan panelvan (Ducato / Sprinter tarzı).
-   - *Taşıma Kapasitesi:* Ağır yük, toplu e-ticaret dağıtımı, paletli mikro lojistik.
+   - *Görsel:* `assets/images/vehicles/maxivan.png` (Uzun şasi yüksek tavan panelvan - Ducato/Sprinter tarzı)
+   - *Taşıma Kapasitesi:* `DOCUMENT`, `SMALL`, `MEDIUM`, `LARGE`, `XLARGE`, `PALLET` (Maksimum 600 Kg).
+6. **`TRUCK` (Ağır Ticari Kamyon / Tır):**
+   - *Görsel:* `assets/images/vehicles/truck.png` (Beyaz dorse çekici / Ağır ticari tır)
+   - *Taşıma Kapasitesi:* Tüm boyutlar + `HEAVY_CARGO` (+600 Kg ve sanayi tipi ağır yükler, Maksimum 25.000 Kg).
+
+### Müşteri Araç Seçim Bileşeni (CreateOrderView):
+Müşteri sipariş verirken seçilen kargo boyutuna uyumlu araçlar arasından dilerse belirli bir araç türünü tercih edebilir. Boyuta uygun olmayan araçlar grileşir ve seçilemez.
+
+### Web ve Masaüstü Duyarlılık (Responsive Constraints):
+Geniş ekranlarda (web/masaüstü) form elemanlarının ve adres kutularının aşırı yayılmasını ve orantısız büyümesini engellemek için tüm ana görünümler `Center` içinde `ConstrainedBox(constraints: BoxConstraints(maxWidth: 680))` ile sınırlandırılmıştır.
 
 ### Araç Seçim Kartı Tasarım Kuralları:
 - Seçilmeyen Kart:

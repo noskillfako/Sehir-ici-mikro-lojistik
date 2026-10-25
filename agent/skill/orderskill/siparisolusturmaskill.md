@@ -10,8 +10,10 @@ Hive'daki `ordersBox` içinde her sipariş aşağıdaki alanlarla saklanır:
 - `customerName` (String): Müşterinin adı soyadı.
 - `courierId` (String?): İlk oluşturulduğunda `null`.
 - `courierName` (String?): İlk oluşturulduğunda `null`.
-- `packageSize` (String): `'DOCUMENT'`, `'SMALL'`, `'MEDIUM'`, `'LARGE'`.
-- `contentType` (String): `'Evrak'`, `'Elektronik'`, `'Gıda / Pasta'`, `'Kıyafet'`, `'Anahtar/Unutulan Eşya'`, `'Evcil Hayvan'`, `'Diğer'`.
+- `courierVehicle` (String?): Kurye atandığında atanan kuryenin araç tipi.
+- `preferredVehicle` (String?): Müşterinin seçtiği opsiyonel araç tercihi (`MOTORCYCLE`, `CAR`, `MINIVAN`, `PANELVAN`, `MAXIVAN`, `TRUCK` veya hepsi için `null`).
+- `packageSize` (String): `'DOCUMENT'`, `'SMALL'`, `'MEDIUM'`, `'LARGE'`, `'XLARGE'`, `'PALLET'`, `'HEAVY_CARGO'` (0 kg - +600 kg).
+- `contentType` (String): `'Evrak'`, `'Elektronik'`, `'Gıda / Pasta'`, `'Kıyafet'`, `'Anahtar/Unutulan Eşya'`, `'Paletli Ağır Yük / Sanayi Parçası'`, `'Evcil Hayvan'`, `'Diğer'`.
 - `customDescription` (String): Müşterinin tamamen kendi belirlediği serbest paket içeriği metni.
 - `isFragile` (bool): Kırılabilir/Hassas gönderi mi?
 - `requiresThermalBag` (bool): Termal çanta gerekiyor mu?

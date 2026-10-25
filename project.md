@@ -15,12 +15,27 @@ Uygulama genelinde sadece aşağıdaki 3 ana Hive kutusu kullanılacaktır:
 2. `sessionBox`: Aktif oturumu ve o anki rolü (`CUSTOMER` veya `COURIER`) tutar.
 3. `ordersBox`: Müşterilerin oluşturduğu tüm kargo/kurye siparişlerini tutar.
 
-## 4. Kargo Boyutları ve Araç Eşleşme Kuralları (Sabit Katalog)
-Müşteri sipariş oluştururken aşağıdaki 4 ana boyuttan birini seçmek zorundadır:
-- `DOCUMENT` (Zarf / Evrak - 0-1 Kg): Tüm kuryeler (`BICYCLE`, `MOTORCYCLE`, `CAR`, `VAN`) görebilir.
-- `SMALL` (Küçük Paket / Çanta Boy - 1-5 Kg): `BICYCLE`, `MOTORCYCLE`, `CAR`, `VAN` görebilir.
-- `MEDIUM` (Orta Koli - 5-15 Kg): Sadece `MOTORCYCLE`, `CAR`, `VAN` görebilir.
-- `LARGE` (Büyük / Hacimli Yük - 15+ Kg): Sadece `CAR` ve `VAN` görebilir (Moto kuryeye düşmez).
+## 4. Kargo Boyutları ve Gerçekçi Araç Eşleşme Kuralları (Sabit Katalog)
+Müşteri sipariş oluştururken 0 kg'dan +600 kg'a kadar 7 ana boyuttan birini seçer:
+- `DOCUMENT` (Zarf / Evrak - 0-1 Kg): Sadece `MOTORCYCLE` ve `CAR` (Bir evrak için TIR veya büyük ticari araç çağrılamaz).
+- `SMALL` (Küçük Paket - 1-5 Kg): `MOTORCYCLE`, `CAR`, `MINIVAN`.
+- `MEDIUM` (Orta Koli - 5-15 Kg): `MOTORCYCLE`, `CAR`, `MINIVAN`, `PANELVAN`.
+- `LARGE` (Büyük Koli / Eşya - 15-60 Kg): `CAR`, `MINIVAN`, `PANELVAN`, `MAXIVAN` (Motosiklete sığmaz).
+- `XLARGE` (Hacimli / Ağır Ticari - 60-200 Kg): `MINIVAN`, `PANELVAN`, `MAXIVAN`.
+- `PALLET` (Paletli / Çok Ağır Yük - 200-600 Kg): `MAXIVAN`, `TRUCK` (Standart Panelvan 450 kg azami kapasiteye sahip olduğundan 450+ kg paleti taşıyamaz).
+- `HEAVY_CARGO` (Devasa Ağır Yük / Sanayi - +600 Kg): Sadece `TRUCK` (Ağır Ticari Kamyon / Tır).
+
+### 4.1. 6 Araç Sınıfı Kataloğu ve Kapasiteleri
+Uygulama 6 gerçek araç sınıfını ve şeffaf görsel kataloglarını destekler:
+1. `MOTORCYCLE` (Motosiklet / Maxi Scooter): Maksimum 15 Kg
+2. `CAR` (Binek Otomobil / Sedan): Maksimum 60 Kg
+3. `MINIVAN` (Kompakt Minivan / City Van): Maksimum 200 Kg
+4. `PANELVAN` (Standart Hafif Ticari Panelvan): Maksimum 450 Kg
+5. `MAXIVAN` (Yüksek Tavan Maxi Panelvan): Maksimum 600 Kg
+6. `TRUCK` (Ağır Ticari Kamyon / Tır): +600 Kg (Maksimum 25.000 Kg)
+
+### 4.2. Müşteri Araç Tercihi (Customer Preferred Vehicle)
+Müşteri sipariş oluştururken seçtiği paket boyutuna ve kilo aralığına uygun araçlar arasından dilerse doğrudan istediği araç sınıfını (`preferredVehicle`) seçebilir veya "Tüm Uygun Araçlar" seçeneğini bırakarak havuza gönderebilir. Kurye eşleşmesinde kuryenin araç türü hem paket boyutuna hem de müşterinin araç tercihine uymalıdır.
 
 ## 5. İçerik Kategorileri ve Etiketler
 - **Kategoriler:** `Evrak`, `Elektronik`, `Gıda / Pasta`, `Kıyafet / Tekstil`, `Unutulan Eşya (Anahtar vb.)`, `Evcil Hayvan`, `Diğer`
