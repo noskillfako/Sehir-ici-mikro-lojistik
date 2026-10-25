@@ -6,6 +6,7 @@ import '../../services/auth_service.dart';
 import '../../services/order_tracking_service.dart';
 import '../../services/session_service.dart';
 import '../../widgets/order_card_widget.dart';
+import '../../widgets/route_duck_logo.dart';
 import '../auth/login_view.dart';
 import 'create_order_view.dart';
 import 'customer_order_detail_view.dart';
@@ -69,7 +70,10 @@ class _CustomerHomeViewState extends State<CustomerHomeView> {
               child: const Text('🦆', style: TextStyle(fontSize: 16)),
             ),
             const SizedBox(width: 8),
-            const Text('routeDuck Müşteri'),
+            const RouteDuckLogo(
+              fontSize: 17,
+              suffix: ' Müşteri',
+            ),
           ],
         ),
         actions: [

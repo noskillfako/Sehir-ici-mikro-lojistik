@@ -51,7 +51,7 @@ class _RouteDuckAppState extends State<RouteDuckApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'routeDuck - Şehir İçi Mikro Lojistik',
+      title: 'RouteDuck - Şehir İçi Mikro Lojistik',
       debugShowCheckedModeBanner: false,
       theme: RouteDuckTheme.lightTheme,
       darkTheme: RouteDuckTheme.darkTheme,

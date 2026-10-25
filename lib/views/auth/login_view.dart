@@ -6,6 +6,7 @@ import '../../models/user_model.dart';
 import '../../services/auth_service.dart';
 import '../../services/hive_database_service.dart';
 import '../../services/session_service.dart';
+import '../../widgets/route_duck_logo.dart';
 import '../courier/courier_pool_view.dart';
 import '../customer/customer_home_view.dart';
 import 'register_view.dart';
@@ -213,13 +214,10 @@ class _LoginViewState extends State<LoginView> {
               ),
               const SizedBox(height: 16),
               const Center(
-                child: Text(
-                  'routeDuck',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: -0.5,
-                  ),
+                child: RouteDuckLogo(
+                  fontSize: 28,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: -0.5,
                 ),
               ),
               const SizedBox(height: 4),

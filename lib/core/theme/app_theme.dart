@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class RouteDuckTheme {
   // === Ortak Renkler ===
   static const Color peachAmber = Color(0xFFEDA45F);
+  static const Color brandDuckColor = Color(0xFFEDA45F); // Logo "Duck" özel rengi (#EDA45F)
   static const Color emeraldGreen = Color(0xFF10B981);
   static const Color deepForest = Color(0xFF0D532B);
   static const Color duckOrange = Color(0xFFE65C00);
