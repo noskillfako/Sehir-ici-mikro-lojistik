@@ -4,7 +4,6 @@
 
 Şehir içi küçük ölçekli teslimatları (paket, evrak, market vb.) gönderici, kurye ve alıcı arasında hızlı ve takip edilebilir şekilde yönetmeyi amaçlayan mobil uygulama.
 
-> **Durum:** 🚧 Geliştirme aşamasında
 
 ---
 
@@ -16,18 +15,6 @@
 - Uygun kuryelere atanır,
 - Teslimat süreci uçtan uca takip edilir.
 
-## ✨ Özellikler
-
-- 🔐 E-posta ile kayıt ve giriş (Firebase Auth)
-- 📦 Gönderi oluşturma (alıcı, adres, paket bilgisi)
-- 🛵 Kurye ataması ve teslimat durumu güncelleme
-- 📍 Canlı konum takibi ve harita üzerinde gösterim
-- 🔔 Anlık bildirimler (durum değişiklikleri)
-- 🧾 Geçmiş teslimatlar ve sipariş detayları
-- 👥 Rol bazlı kullanım: [Gönderici / Kurye / Admin]
-
-> Not: Gerçekte olmayan özellikleri listeden çıkar.
-
 ## 🛠️ Kullanılan Teknolojiler
 
 | Katman | Teknoloji |
@@ -36,7 +23,6 @@
 | Veritabanı | Cloud Firestore |
 | Kimlik Doğrulama | Firebase Auth |
 | Sunucu Mantığı | Firebase Cloud Functions |
-| Harita / Konum | [Google Maps / OpenStreetMap] |
 | Durum Yönetimi | [Provider / Riverpod / Bloc] |
 
 ## 📂 Proje Yapısı
